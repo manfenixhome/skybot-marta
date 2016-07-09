@@ -27,7 +27,9 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
           msg.content match {
             case "ping" => sendService.sendMessage(msg.from, "pong")
             case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
-            case "opendoor" => new DoorOpenerService().openDoor
+            case x if new DoorOpenerService().hasKeywords(x) =>
+                      new DoorOpenerService().openDoor(msg.from, sendService)
+            case "opendoor" => new DoorOpenerService().openDoor(msg.from, sendService)
             case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
           }
         }
