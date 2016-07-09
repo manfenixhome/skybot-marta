@@ -1,0 +1,13 @@
+@(webPage: model.WebPage)(content: Html)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        @commons.header_styles()
+    </head>
+    <body>
+        @content
+
+        <!-- CODE FOOTER -->
+        @commons.footer_code(webPage.name)
+    </body>
+</html>

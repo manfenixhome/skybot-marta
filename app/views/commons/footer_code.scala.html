@@ -1,0 +1,23 @@
+@(pageName: String)
+
+<!-- JQuery -->
+<script type="text/javascript" src="@routes.Assets.versioned("js/jquery.min.js")"></script>
+
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="@routes.Assets.versioned("js/bootstrap.min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("js/knockout-min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("js/marta/viewmodel.ko.js")"></script>
+
+
+@pageName match {
+    case "index" => {
+        <script type="text/javascript">
+//            $(document).ready(function () {
+//                ko.applyBindings(new mba.viewmodel.LoginView(), document.getElementById('loginBind'));
+//            })
+        </script>
+    }
+    case _ => {
+
+    }
+}
