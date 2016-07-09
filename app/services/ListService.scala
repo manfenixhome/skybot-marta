@@ -18,15 +18,16 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient) {
 
   def showList(userID: String, sendService: SendMessageService): Unit = {
     println("Show list")
-    /*ws.url("http://doorbell.ekreative.com/app").get.map {
+    ws.url("http://10.0.1.249/api/workers").get.map {
       response =>
         if (response.status == 200) {
-          sendService.sendMessage(userID, "Door opened")
+
+          sendService.sendMessage(userID, "List:")
           //println("Door opened")
         } else {
-          sendService.sendMessage(userID, "Failed")
+          sendService.sendMessage(userID, "Failed get data from Viktor server")
           //println("Failed")
         }
-    }*/
+    }
   }
 }
