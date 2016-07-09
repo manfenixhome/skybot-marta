@@ -28,14 +28,9 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
             case "ping" => sendService.sendMessage(msg.from, "pong")
             case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
             case "opendoor" => new DoorOpenerService().openDoor
-            case _ =>
+            case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
           }
         }
         Ok("OK")
     }
-
-
-//  private def updateAuthToken: String = {
-//    ws.url().withHeaders()
-//  }
 }
