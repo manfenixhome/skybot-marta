@@ -1,8 +1,13 @@
 package services
 
 import play.api.libs.ws.WSClient
+
 import scala.concurrent.ExecutionContext
 import javax.inject.{Inject, Singleton}
+
+import com.codahale.jerkson.Json
+import com.codahale.jerkson.{ParsingException, Json => json}
+import model.AuthToken
 
 /**
   * Created by cheb on 7/9/16.
@@ -21,7 +26,7 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient) {
     ws.url("http://10.0.1.249/api/workers").get.map {
       response =>
         if (response.status == 200) {
-
+          //val tokenObj = json.parse[AuthToken](response.body)
           sendService.sendMessage(userID, "List:")
           //println("Door opened")
         } else {
