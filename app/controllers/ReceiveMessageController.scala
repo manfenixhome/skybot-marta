@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext
 
@@ -13,5 +13,9 @@ import scala.concurrent.ExecutionContext
 class ReceiveMessageController @Inject()(implicit exec: ExecutionContext) extends Controller {
 
 
-
+    def receive = Action {
+      request =>
+        println(request.body.toString)
+        Ok("OK")
+    }
 }
