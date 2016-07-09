@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller}
 import com.codahale.jerkson.{ParsingException, Json => json}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-
+import services.DoorOpenerService
 import scala.concurrent.ExecutionContext
 
 /**
@@ -25,12 +25,15 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
           msg.content match {
             case "ping" => sendMessage(msg.from, "pong")
             case x if x.toUpperCase.contains("HI") => sendMessage(msg.from, "Hi "+ msg.from)
+            case "opendoor" => new DoorOpenerService().openDoor
             case _ =>
           }
         }
         println(messages)
         Ok("OK")
     }
+
+
 
   private def sendMessage(userId: String, message: String): Unit = {
     val param = Json.obj(
