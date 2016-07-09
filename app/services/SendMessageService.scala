@@ -20,7 +20,7 @@ class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient
 
   var token: String = ""
 
-  def sendMessage(userId: String, message: String): Unit = {
+  def sendMessage(userId: String, message: String, step: Int = 0): Unit = {
     val param = Json.obj(
       "message" -> Json.obj (
         "content" -> message
@@ -35,7 +35,8 @@ class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient
           response.status match {
             case 201 =>
             case _ => updateToken match {
-              case true => sendMessage(userId, message)
+                //try repeat not more that 3 times
+              case true => if (step < 3) {sendMessage(userId, message, step + 1)}
               case false =>
             }
           }
