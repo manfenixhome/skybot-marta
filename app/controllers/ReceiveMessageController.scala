@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller}
 import com.codahale.jerkson.{ParsingException, Json => json}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import services.{DoorOpenerService, HelloService, SendMessageService}
+import services.{DoorOpenerService, HelloService, ListService, SendMessageService}
 
 import scala.concurrent.ExecutionContext
 
@@ -29,6 +29,8 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
             case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
             case x if new DoorOpenerService().hasKeywords(x) =>
                       new DoorOpenerService().openDoor(msg.from, sendService)
+            case x if new ListService().hasKeywords(x) =>
+                      new ListService().showList(msg.from, sendService)
             case "opendoor" => new DoorOpenerService().openDoor(msg.from, sendService)
             case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
           }
