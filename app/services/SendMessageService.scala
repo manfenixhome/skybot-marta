@@ -2,18 +2,23 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
+import model.{AuthToken, UserMessage}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext, Future}
+import com.codahale.jerkson.{ParsingException, Json => json}
+import scala.concurrent.duration._
 
 /**
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
 class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient)  {
+  val appId = "569ef52b-63f6-43a7-bda3-f1a6b5b29f80"
+  val secretKey = "Z3fUGDu9iF9xFF9HdDvtJtL"
 
-  var token: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBPWWlKSE1iYTlnb0VLWSIsImtpZCI6Ik1uQ19WWmNBVGZNNXBPWWlKSE1iYTlnb0VLWSJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDcvIiwiaWF0IjoxNDY4MDg1MDQwLCJuYmYiOjE0NjgwODUwNDAsImV4cCI6MTQ2ODA4ODk0MCwiYXBwaWQiOiI1NjllZjUyYi02M2Y2LTQzYTctYmRhMy1mMWE2YjViMjlmODAiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDcvIiwidGlkIjoiNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3IiwidmVyIjoiMS4wIn0.k9gUdvAqrr92uV2l9JpBsttyfyqLu6xOLn5p7OZK_QUFrS1QVowuoN_TDyxLJDw_UMmxzhLlQyqAbTW0LxCXchJ0skqd8ERGLx9odm8NwtgPEfWCfEmzm705cJPT0JFvAxVQ0qOPkOmCISGh1KnYK5jVCfHiXx7fL4Rw_NKWtqAItGd4U5oUoWYWkA_dJ03crQtWGOLuHJNyhyKlyJa4V1K237ERA3rxZDraO9RqszxSASrqb7ly0wv4u1fxMvn_UY6ROd6dO-hfmg0xeC3JGw98LCz8AtU0i2LiAyjPyJDWRjvUaVt_Kfs8dTlWwBGhzbaHC3k9098wZLhXfihO3Q"
+  var token: String = ""
 
   def sendMessage(userId: String, message: String): Unit = {
     val param = Json.obj(
@@ -26,9 +31,39 @@ class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient
       .post(param)
       .map {
         response =>
-
-          println(response)
+          println(response.status)
+          response.status match {
+            case 201 =>
+            case _ => updateToken match {
+              case true => sendMessage(userId, message)
+              case false =>
+            }
+          }
       }
+  }
+
+  def updateToken = {
+    var params = ""
+    params += "client_id="+appId
+    params += "&client_secret=" +secretKey
+    params += "&grant_type=client_credentials"
+    params += "&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default"
+    println(params)
+    val request = ws.url("https://login.microsoftonline.com/common/oauth2/v2.0/token")
+      .withHeaders("Content-Type" -> "application/x-www-form-urlencoded")
+      .post(params)
+      .map{
+        response =>
+          println("updateToken status code="+response.status)
+          if (response.status == 200) {
+            val tokenObj = json.parse[AuthToken](response.body)
+            token = tokenObj.access_token
+            true
+          } else {
+            false
+          }
+      }
+    Await.result(request, 30 seconds)
   }
 
 }
