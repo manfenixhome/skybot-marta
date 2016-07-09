@@ -2,7 +2,10 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import model.UserMessage
 import play.api.mvc.{Action, Controller}
+import play.libs.Json
+import com.codahale.jerkson.{ParsingException, Json => json}
 
 import scala.concurrent.ExecutionContext
 
@@ -12,10 +15,10 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ReceiveMessageController @Inject()(implicit exec: ExecutionContext) extends Controller {
 
-
-    def receive = Action {
+    def receive = Action(parse.json) {
       request =>
-        println(request.body.toString)
+        val message = request.body.as[Seq[UserMessage]]
+        println(message)
         Ok("OK")
     }
 }
