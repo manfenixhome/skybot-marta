@@ -6,6 +6,7 @@ package model
 class Technology(
                   id: Long,
                   name: String,
+                  tagType: String,
                   description: String,
                   image: Image
                 ) {

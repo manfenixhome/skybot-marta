@@ -6,6 +6,7 @@ package model
 class Language(
                 id: Long,
                 name: String,
+                tagType: String,
                 description: String,
                 image: Image
               ) {
