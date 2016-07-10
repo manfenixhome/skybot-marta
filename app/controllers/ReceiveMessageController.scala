@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 import model.UserMessage
 import play.api.mvc.{Action, Controller}
 import com.codahale.jerkson.{ParsingException, Json => json}
+import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import services._
@@ -15,7 +16,7 @@ import scala.concurrent.ExecutionContext
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
-class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WSClient) extends Controller {
+class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) extends Controller {
 
   val sendService = new SendMessageService()
 
