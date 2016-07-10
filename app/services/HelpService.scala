@@ -16,7 +16,7 @@ object HelpService {
   def showHelp(msg: UserMessage, sendService: SendMessageService): Unit = {
     sendService.sendMessage(msg.from,
       "list - show all coworkers\n" +
-      "whois [skypeID] - show user info\n" +
+      "whois [skype ID] - show user info\n" +
       "opendoor - open garden gate\n" +
       "help - show help\n" +
       "tasks - show all tasks to subscribe\n" +

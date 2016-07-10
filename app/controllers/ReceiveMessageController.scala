@@ -33,6 +33,8 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
                       new DoorOpenerService().openDoor(msg.from, sendService)
             case x if new ListService().hasKeywords(x) =>
                       new ListService().showList(msg.from, sendService)
+            case x if new WhoisService().hasKeywords(x) =>
+              new WhoisService().trySearch(x, msg.from, sendService)
             case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
           }
         }
