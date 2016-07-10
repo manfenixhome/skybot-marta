@@ -9,6 +9,7 @@ import org.joda.time.{DateTime, DateTimeConstants}
   * Created by cheb on 7/9/16.
   */
 case class Task(id: Long,
+                title: String,
                 message: String,
                 ttl: Long,
                 delay: Long, // in millis
@@ -21,8 +22,8 @@ object Task {
   val tasks = Seq(
     //    Task(1, "You will working from home tomorrow?", 10, 15, new DateTime(), Seq("-Yes", "-No")),
     //      Task(2, "Sorry for disturb you, could you please write your lunch for tomorrow? \nhttps://goo.gl/DhwCDt\nThanks", 0 , 30, new DateTime(), Seq())
-    Task(1, "You will working tomorrow from home?", 10, 60 * 60 * 24 * 7 /*7 days*/, calcFirstDay(DateTimeConstants.WEDNESDAY, 15, 7), Seq("-Yes", "-No")),
-    Task(2, "Sorry for disturb you, could you please write your lunch for tomorrow? \nhttps://goo.gl/DhwCDt\nThanks", 0 , 60 * 60 * 24, calcFirstDay(new DateTime().getDayOfWeek, 17, 1), Seq())
+    Task(1, "Working from home", "You will working tomorrow from home?", 10, 60 * 60 * 24 * 7 /*7 days*/, calcFirstDay(DateTimeConstants.WEDNESDAY, 15, 7), Seq("-Yes", "-No")),
+    Task(2, "Food hacker lunch", "Sorry for disturb you, could you please write your lunch for tomorrow? \nhttps://goo.gl/DhwCDt\nThanks", 0 , 60 * 60 * 24, calcFirstDay(new DateTime().getDayOfWeek, 17, 1), Seq())
   )
 
   def calcFirstDay(dayOfWeek: Int, hour: Int, delayInDays: Int): DateTime = {
