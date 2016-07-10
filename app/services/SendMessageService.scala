@@ -13,14 +13,18 @@ import scala.concurrent.duration._
 /**
   * Created by ekreative on 7/9/2016.
   */
+
+trait SendMessage {
+  def sendMessage(userId: String, message: String, step: Int = 0): Unit
+}
 @Singleton
-class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient)  {
-  val appId = "569ef52b-63f6-43a7-bda3-f1a6b5b29f80"
-  val secretKey = "Z3fUGDu9iF9xFF9HdDvtJtL"
+class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient)  extends SendMessage {
+  private val appId = "569ef52b-63f6-43a7-bda3-f1a6b5b29f80"
+  private val secretKey = "Z3fUGDu9iF9xFF9HdDvtJtL"
 
-  var token: String = ""
+  private var token: String = ""
 
-  def sendMessage(userId: String, message: String, step: Int = 0): Unit = {
+  override def sendMessage(userId: String, message: String, step: Int = 0): Unit = {
     val param = Json.obj(
       "message" -> Json.obj (
         "content" -> message

@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import akka.actor.ActorSystem
 import model.UserMessage
 import play.api.mvc.{Action, Controller}
 import com.codahale.jerkson.{ParsingException, Json => json}
@@ -16,9 +17,7 @@ import scala.concurrent.ExecutionContext
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
-class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) extends Controller {
-
-  val sendService = new SendMessageService()
+class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) extends Controller {
 
     def receive = Action(parse.json) {
       request =>
@@ -27,6 +26,7 @@ class ReceiveMessageController @Inject()(implicit exec: ExecutionContext, ws: WS
         for (msg <- messages) {
           msg.content match {
             case "ping" => sendService.sendMessage(msg.from, "pong")
+            case "launchtask" => new TaskScheduleService(actorSystem, sendService).startPlanning()
             case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
             case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
             case x if new DoorOpenerService().hasKeywords(x) =>
