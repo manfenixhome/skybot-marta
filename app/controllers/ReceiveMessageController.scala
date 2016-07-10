@@ -26,8 +26,9 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
       for (msg <- messages) {
         msg.content match {
           case "ping" => sendService.sendMessage(msg.from, "pong")
-          case "launchtask" => new TaskScheduleService(actorSystem, sendService).startPlanning()
+          case "start-tasks" => new TaskScheduleService(actorSystem, sendService).startPlanning
           case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
+          case x if SubscribeService.hasKeywords(x) => SubscribeService.doAction(msg, sendService)
           case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
           case x if new DoorOpenerService().hasKeywords(x) =>
             new DoorOpenerService().openDoor(msg.from, sendService)
@@ -36,7 +37,8 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
           case x if new WhoisService().hasKeywords(x) =>
             new WhoisService().trySearch(x, msg.from, sendService)
           //case "redmine" => new RedmineService().doCheck(msg.from, sendService)
-          case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
+          case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want. I'm not smart enough".format(msg.realName))
+                    sendService.sendMessage(msg.from, "(sadness)")
         }
       }
       Ok("OK")
