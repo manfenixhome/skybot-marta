@@ -7,15 +7,15 @@ import play.api.libs.functional.syntax._
 /**
   * Created by cheb on 7/9/16.
   */
-case class Image(
+case class Picture(
              id: Long,
              name: String,
              src: String
            )
-object Image{
-  implicit val imageReads: Reads[Image] = (
+object Picture{
+  implicit val picturesReads: Reads[Picture] = (
       (JsPath \ "id").read[Long] and
       (JsPath \ "name").read[String] and
       (JsPath \ "src").read[String]
-    ) (Image.apply _)
+    ) (Picture.apply _)
 }

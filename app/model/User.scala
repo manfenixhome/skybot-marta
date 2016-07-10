@@ -25,7 +25,7 @@ case class User(
                  skype: String,
                  startWorking: String,
                  securityKeyToComputer: String,
-                 images: Option[Seq[Image]],
+                 images: Option[Seq[Picture]],
                  technology: Option[Seq[Technology]],
                  caste: Option[Seq[Caste]],
                  language: Option[Seq[Language]]
@@ -34,7 +34,7 @@ case class User(
 object User {
 
   import model.Technology._
-  import model.Image._
+  import model.Picture._
   import model.Caste._
   import model.Language._
 
@@ -54,7 +54,7 @@ object User {
       (JsPath \ "skype").read[String] and
       (JsPath \ "startWorking").read[String] and
       (JsPath \ "securityKeyToComputer").read[String] and
-      (JsPath \ "images").lazyReadNullable(Reads.list[Image](imageReads)) and
+      (JsPath \ "images").lazyReadNullable(Reads.list[Picture](picturesReads)) and
       (JsPath \ "technology").lazyReadNullable(Reads.list[Technology](technologyReads)) and
       (JsPath \ "caste").lazyReadNullable(Reads.list[Caste](casteReads)) and
       (JsPath \ "language").lazyReadNullable(Reads.list[Language](languageReads))

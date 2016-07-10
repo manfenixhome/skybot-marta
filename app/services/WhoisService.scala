@@ -53,14 +53,14 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
   def doSearch(q: String, userID: String, sendService: SendMessageService): Unit = {
     println("Search for: " + q);
 
-    val users: Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 12.hours) {
+    val users: Seq[User] = /*cache.getOrElse[Seq[User]]("users.filter", 12.hours) */{
       val request = ws.url("http://10.0.1.249/api/workers").get.map {
         response =>
           println(response.status)
           var users = Seq[User]()
           if (response.status == 200) {
             users = json.parse[Seq[User]](Json.parse(response.body).\("workers").get.toString())
-            findUsers(q, users, userID, sendService)
+            //findUsers(q, users, userID, sendService)
           } else {
             sendService.sendMessage(userID, "Failed get data from Viktor server")
           }
@@ -86,14 +86,24 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
     //val sb = mutable.Buffer[String]()
     val sb = new java.lang.StringBuilder
     users.foreach { item =>
-      sb.append("name: " + item.name)
-      sb.append(" skype: " + item.skype)
-      if (item.images.isDefined && item.images.nonEmpty) {
+      sb.append("\nname: " + item.name)
+      sb.append("\nskype: " + item.skype)
+      sb.append("\nworkingEmail: " + item.workingEmail)
+      sb.append("\nstartWorking: " + item.startWorking)
+      sb.append("\nbirthday: " + item.birthday)
+      if (item.technology.isDefined && item.technology.get.nonEmpty){
+        sb.append("\ntechnologies: " + item.technology.get.toString())
+      }
+      /*if (item.technology.isDefined && item.technology.get.nonEmpty){
+        sb.append(" technologies: \n" )
+        sb.append(item.technology.get.map(t => t.name).mkString("\n"))
+      }*/
+      /*if (item.images.isDefined && item.images.nonEmpty) {
         val image =  item.images.get.head
         sb.append(" image: " + image.src)
-      }
+      }*/
       sb.append("\n")
     }
-    sendService.sendMessage(userID, "List: \n" + sb.toString())
+    sendService.sendMessage(userID, "Result: \n" + sb.toString())
   }
 }

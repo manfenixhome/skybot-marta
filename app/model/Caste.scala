@@ -12,18 +12,18 @@ case class Caste(
                   name: String,
                   tagType: String,
                   description: Option[String],
-                  image: Option[Image]
+                  image: Option[Picture]
                 )
 
 object Caste {
 
-  import model.Image._
+  import model.Picture._
 
   implicit val casteReads: Reads[Caste] = (
     (JsPath \ "id").read[Long] and
       (JsPath \ "name").read[String] and
       (JsPath \ "tagType").read[String] and
       (JsPath \ "description").readNullable[String] and
-      (JsPath \ "image").readNullable[Image]
+      (JsPath \ "image").readNullable[Picture]
     ) (Caste.apply _)
 }

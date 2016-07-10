@@ -11,17 +11,17 @@ case class Language(
                 name: String,
                 tagType: String,
                 description: Option[String],
-                image: Option[Image]
+                image: Option[Picture]
               )
 object Language{
 
-  import model.Image._
+  import model.Picture._
 
   implicit val languageReads: Reads[Language] = (
     (JsPath \ "id").read[Long] and
       (JsPath \ "name").read[String] and
       (JsPath \ "tagType").read[String] and
       (JsPath \ "description").readNullable[String] and
-      (JsPath \ "image").readNullable[Image]
+      (JsPath \ "image").readNullable[Picture]
     ) (Language.apply _)
 }
