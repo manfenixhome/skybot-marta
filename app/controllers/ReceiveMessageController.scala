@@ -35,6 +35,7 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
             new ListService().showList(x, msg.from, sendService)
           case x if new WhoisService().hasKeywords(x) =>
             new WhoisService().trySearch(x, msg.from, sendService)
+          //case "redmine" => new RedmineService().doCheck(msg.from, sendService)
           case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
         }
       }
