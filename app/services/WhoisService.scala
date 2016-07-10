@@ -86,6 +86,7 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
     //val sb = mutable.Buffer[String]()
     val sb = new java.lang.StringBuilder
     users.foreach { item =>
+      sb.append("\nid: " + item.id)
       sb.append("\nname: " + item.name)
       sb.append("\nskype: " + item.skype)
       sb.append("\nworkingEmail: " + item.workingEmail)

@@ -17,6 +17,7 @@ import scala.concurrent.duration._
   */
 class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) {
 
+  val keys = Seq("-a", "-dgb")
   val keywords = Seq("list", "ls", "lst")
 
   def hasKeywords(message: String): Boolean = {
@@ -24,16 +25,16 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
     keywords.exists(key => tags.contains(key))
   }
 
-  def showList(userID: String, sendService: SendMessageService): Unit = {
+  def showList(msg: String, userID: String, sendService: SendMessageService): Unit = {
     println("Show list")
-    val users:  Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 12.hours){
+    val users: Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 12.hours) {
       val request = ws.url("http://10.0.1.249/api/workers").get.map {
         response =>
           println(response.status)
           var users = Seq[User]()
           if (response.status == 200) {
             users = json.parse[Seq[User]](Json.parse(response.body).\("workers").get.toString())
-            printUsers(users,userID, sendService)
+            //printUsers(msg, users, userID, sendService)
           } else {
             sendService.sendMessage(userID, "Failed get data from Viktor server")
           }
@@ -41,17 +42,51 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
       }
       Await.result(request, 30 seconds)
     }
-    printUsers(users,userID, sendService)
+    printUsers(msg, users, userID, sendService)
   }
 
-  def printUsers(users: Seq[User],userID: String, sendService: SendMessageService): Unit ={
+  def printUsers(msg: String, users: Seq[User], userID: String, sendService: SendMessageService): Unit = {
     println(users)
-    val sb = new java.lang.StringBuilder
-    users.foreach{ item =>
-      sb.append("name: " + item.name)
-      sb.append(" skype: " + item.skype)
-      sb.append("\n")
+    val tags = msg.toLowerCase.split(" ")
+    if (tags.length > 1){
+      if (tags.contains("-dbg")){
+        val sb = new java.lang.StringBuilder
+        users.foreach { item =>
+          sb.append(item.toString + "\n\n")
+        }
+        sendService.sendMessage(userID, "List: \n" + sb)
+      }else if (tags.contains("-a")){
+        val sb = new java.lang.StringBuilder
+        users.foreach { item =>
+          sb.append("id: " + item.id)
+          sb.append(" name: " + item.name)
+          sb.append(" skype: " + item.skype)
+          sb.append(" workingEmail: " + item.workingEmail)
+          sb.append(" startWorking: " + item.startWorking)
+          sb.append(" birthday: " + item.birthday)
+          if (item.technology.isDefined && item.technology.get.nonEmpty){
+            sb.append("technologies: " + item.technology.get.toString())
+          }
+          sb.append("\n\n")
+        }
+        sendService.sendMessage(userID, "List: \n" + sb)
+      }else{
+        val sb = new java.lang.StringBuilder
+        users.foreach { item =>
+          sb.append("name: " + item.name)
+          sb.append(" skype: " + item.skype)
+          sb.append("\n")
+        }
+        sendService.sendMessage(userID, "List: \n" + sb)
+      }
+    }else{
+      val sb = new java.lang.StringBuilder
+      users.foreach { item =>
+        sb.append("name: " + item.name)
+        sb.append(" skype: " + item.skype)
+        sb.append("\n")
+      }
+      sendService.sendMessage(userID, "List: \n" + sb)
     }
-    sendService.sendMessage(userID, "List: \n" + sb)
   }
 }

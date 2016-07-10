@@ -19,25 +19,25 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) extends Controller {
 
-    def receive = Action(parse.json) {
-      request =>
-        val messages = request.body.as[Seq[UserMessage]]
-        println(messages)
-        for (msg <- messages) {
-          msg.content match {
-            case "ping" => sendService.sendMessage(msg.from, "pong")
-            case "launchtask" => new TaskScheduleService(actorSystem, sendService).startPlanning()
-            case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
-            case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
-            case x if new DoorOpenerService().hasKeywords(x) =>
-                      new DoorOpenerService().openDoor(msg.from, sendService)
-            case x if new ListService().hasKeywords(x) =>
-                      new ListService().showList(msg.from, sendService)
-            case x if new WhoisService().hasKeywords(x) =>
-              new WhoisService().trySearch(x, msg.from, sendService)
-            case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
-          }
+  def receive = Action(parse.json) {
+    request =>
+      val messages = request.body.as[Seq[UserMessage]]
+      println(messages)
+      for (msg <- messages) {
+        msg.content match {
+          case "ping" => sendService.sendMessage(msg.from, "pong")
+          case "launchtask" => new TaskScheduleService(actorSystem, sendService).startPlanning()
+          case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
+          case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
+          case x if new DoorOpenerService().hasKeywords(x) =>
+            new DoorOpenerService().openDoor(msg.from, sendService)
+          case x if new ListService().hasKeywords(x) =>
+            new ListService().showList(x, msg.from, sendService)
+          case x if new WhoisService().hasKeywords(x) =>
+            new WhoisService().trySearch(x, msg.from, sendService)
+          case _ => sendService.sendMessage(msg.from, "Sorry %s, but I don't understand what you want".format(msg.realName))
         }
-        Ok("OK")
-    }
+      }
+      Ok("OK")
+  }
 }
