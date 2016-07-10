@@ -27,8 +27,8 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
       for (msg <- messages) {
         msg.content match {
           case "ping" => sendService.sendMessage(msg.from, "pong")
-          case "start-tasks" => new TaskScheduleService(actorSystem, sendService).startPlanning
-          case x if x.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
+          case "admin-start-tasks" => new TaskScheduleService(actorSystem, sendService).startPlanning
+          case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
           case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
           case x if SubscribeService.hasKeywords(x) => SubscribeService.doAction(msg, sendService)
           case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
