@@ -38,4 +38,18 @@ object DB {
     taskSubscribers.remove(DBObject("taskId" -> taskId, "skypeName" -> skypeName)).getN > 0
   }
 
+  def getTasksByUser(skypeName: String): Seq[Long] = {
+    val buffer = mutable.Buffer[Long]()
+
+    val pipeline: java.util.List[DBObject] = List(
+      DBObject("$match" -> MongoDBObject("skypeName" -> skypeName))
+    ).asJava
+
+    val iterator = taskSubscribers.aggregate(pipeline).results().iterator()
+    while (iterator.hasNext) {
+      buffer.append(iterator.next().getAs[Long]("taskId").getOrElse(0))
+    }
+    buffer.filterNot(taskId => taskId == 0)
+  }
+
 }

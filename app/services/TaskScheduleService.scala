@@ -46,6 +46,4 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
     Seconds.secondsBetween(DateTime.now(), launch).getSeconds
   }
 
-
-
 }

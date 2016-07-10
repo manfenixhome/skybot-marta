@@ -11,6 +11,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import services._
 import model.Task
+import utils.DB
 
 import scala.concurrent.ExecutionContext
 
@@ -28,7 +29,15 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
         msg.content match {
           case "ping" => sendService.sendMessage(msg.from, "pong")
           case "admin-start-tasks" => new TaskScheduleService(actorSystem, sendService).startPlanning
-          case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
+          case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is s list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
+          case x if x.toLowerCase.matches("^my\\s+tasks\\s*") => {
+            val myTasksIds = DB.getTasksByUser(msg.from)
+            val myTasks = Task.tasks.filter(t => myTasksIds.contains(t.id))
+            myTasks.nonEmpty match {
+              case true => sendService.sendMessage(msg.from, "Here is s list of all your tasks:\n" + myTasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
+              case false => sendService.sendMessage(msg.from, "I'm sorry but seems you don't have any tasks (shake)")
+            }
+          }
           case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
           case x if SubscribeService.hasKeywords(x) => SubscribeService.doAction(msg, sendService)
           case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
