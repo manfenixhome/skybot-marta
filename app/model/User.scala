@@ -11,6 +11,8 @@ import com.codahale.jerkson.{ParsingException, Json => json}
   */
 case class User(
                  id: Long,
+                 redmineId: String,
+                 whereIsSitting: String,
                  about: String,
                  name: String,
                  address: String,
@@ -39,7 +41,9 @@ object User {
   import model.Language._
 
   implicit val userReads: Reads[User] = (
-      (JsPath \ "id").read[Long] and
+    (JsPath \ "id").read[Long] and
+      (JsPath \ "redmineId").read[String] and
+      (JsPath \ "whereIsSitting").read[String] and
       (JsPath \ "about").read[String] and
       (JsPath \ "name").read[String] and
       (JsPath \ "address").read[String] and

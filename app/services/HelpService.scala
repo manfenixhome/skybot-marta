@@ -21,7 +21,7 @@ object HelpService {
       "help - show help\n" +
       "tasks - show all tasks to subscribe\n" +
       "subscribe [task ID] - subscribe on the task\n" +
-      "unsubscribe [task ID] - unsubscribe on the task\n" +
+      "unsubscribe [task ID] - unsubscribe from the task\n" +
       "book - comming soon"
     )
   }
