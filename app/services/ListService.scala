@@ -35,6 +35,13 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient) {
           println(users.head.technology.get)
           println(users.head.caste.get)
           println(users.head.language.get)
+          val sb = new java.lang.StringBuilder
+          users.foreach{ item =>
+            sb.append("name: " + item.name)
+            sb.append(" skype: " + item.skype)
+            sb.append("\n")
+          }
+          sendService.sendMessage(userID, "List: \n" + sb)
 
           //println(users.head.technology.head.)
 /*          val users = json.parse[Seq[User]](Json.parse(response.body).\("workers").get.toString())
@@ -48,8 +55,8 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient) {
           val u = json.parse[User](user.toString())
           println(u.name)*/
 
-          sendService.sendMessage(userID, "List:")
-          //println("Door opened")
+
+          //println("OK")
         } else {
           sendService.sendMessage(userID, "Failed get data from Viktor server")
           //println("Failed")
