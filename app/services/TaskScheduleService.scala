@@ -36,10 +36,19 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
       //TODO getList of users for task
       val today = new DateTime().getDayOfWeek
 //      if (today != DateTimeConstants.SATURDAY && today != DateTimeConstants.SUNDAY) {
+      println("start task="+task.title)
         val users = DB.getUsersByTaskId(task.id)
+      println("users="+users)
         users.foreach(user => sendService.sendMessage(user, "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n"))))
 //      }
     }
+  }
+
+  def launchTask(task: Task): Unit = {
+    println("admin started task="+task.title)
+    val users = DB.getUsersByTaskId(task.id)
+    println("users="+users)
+    sendService.sendMessage("8:antonekreative", "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n")))
   }
 
   def nextExecutionInSeconds(launch: DateTime): Int = {

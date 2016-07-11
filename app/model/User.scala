@@ -3,8 +3,6 @@ package model
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import play.api.libs.json
-import com.codahale.jerkson.{ParsingException, Json => json}
 
 /**
   * Created by cheb on 7/9/16.
@@ -27,7 +25,7 @@ case class User(
                  skype: String,
                  startWorking: String,
                  securityKeyToComputer: String,
-                 images: Option[Seq[Picture]],
+//                 images: Seq[Map[String, String]],
                  technology: Option[Seq[Technology]],
                  caste: Option[Seq[Caste]],
                  language: Option[Seq[Language]]
@@ -58,7 +56,7 @@ object User {
       (JsPath \ "skype").read[String] and
       (JsPath \ "startWorking").read[String] and
       (JsPath \ "securityKeyToComputer").read[String] and
-      (JsPath \ "images").lazyReadNullable(Reads.list[Picture](picturesReads)) and
+//      (JsPath \ "images").read[Seq[Map[String, String]]] and
       (JsPath \ "technology").lazyReadNullable(Reads.list[Technology](technologyReads)) and
       (JsPath \ "caste").lazyReadNullable(Reads.list[Caste](casteReads)) and
       (JsPath \ "language").lazyReadNullable(Reads.list[Language](languageReads))

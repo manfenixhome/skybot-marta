@@ -30,6 +30,7 @@ class SendMessageService @Inject()(implicit exec: ExecutionContext, ws: WSClient
         "content" -> message
       )
     )
+    println("message"+message)
     ws.url("https://apis.skype.com/v2/conversations/%s/activities".format(userId))
       .withHeaders("Authorization" -> ("Bearer " + token))
       .post(param)

@@ -23,12 +23,14 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
 
   def receive = Action(parse.json) {
     request =>
+      println("request body ="+request.body)
       val messages = request.body.as[Seq[UserMessage]]
       println(messages)
       for (msg <- messages) {
-        msg.content match {
-          case "ping" => sendService.sendMessage(msg.from, "pong")
-          case "admin-start-tasks" => new TaskScheduleService(actorSystem, sendService).startPlanning
+        msg.content.toLowerCase match {
+          case x if x.matches("^ping\\s*") => sendService.sendMessage(msg.from, "pong")
+          case x if "admin-start-tasks".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService).startPlanning
+          case x if "start task 2".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService).launchTask(Task.tasks(1))
           case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is s list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
           case x if x.toLowerCase.matches("^my\\s+tasks\\s*") => {
             val myTasksIds = DB.getTasksByUser(msg.from)

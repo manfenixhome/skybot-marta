@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.libs.json._
 import com.codahale.jerkson.{ParsingException, Json => json}
-import model.{AuthToken, User}
+import model.{AuthToken, Picture, User}
 import play.api.cache.CacheApi
 
 import scala.concurrent.duration._
@@ -28,7 +28,7 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
   def showList(msg: String, userID: String, sendService: SendMessageService): Unit = {
     println("Show list")
     val users: Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 12.hours) {
-      val request = ws.url("http://10.0.1.249/api/workers").get.map {
+      val request = ws.url("http://eworkers.paul.ekreative.com/api/workers").get.map {
         response =>
           println(response.status)
           var users = Seq[User]()
@@ -36,7 +36,7 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
             users = json.parse[Seq[User]](Json.parse(response.body).\("workers").get.toString())
             //printUsers(msg, users, userID, sendService)
           } else {
-            sendService.sendMessage(userID, "Failed get data from Viktor server")
+            sendService.sendMessage(userID, "Failed get data from eWorkers API")
           }
           users
       }
@@ -46,7 +46,7 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
   }
 
   def printUsers(msg: String, users: Seq[User], userID: String, sendService: SendMessageService): Unit = {
-    println(users)
+//    println(users)
     val tags = msg.toLowerCase.split(" ")
     if (tags.length > 1){
       if (tags.contains("-dbg")){
@@ -58,7 +58,6 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
       }else if (tags.contains("-a")){
         val sb = new java.lang.StringBuilder
         users.foreach { item =>
-          sb.append("id: " + item.id)
           sb.append(" name: " + item.name)
           sb.append(" skype: " + item.skype)
           sb.append(" workingEmail: " + item.workingEmail)
@@ -75,6 +74,12 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
         users.foreach { item =>
           sb.append("name: " + item.name)
           sb.append(" skype: " + item.skype)
+//          println("images.size=" + item.images.size)
+//          item.images.headOption match {
+//            case Some(picture) => sb.append("\n image: " + picture )
+//            case None =>
+//          }
+
           sb.append("\n")
         }
         sendService.sendMessage(userID, "List: \n" + sb)

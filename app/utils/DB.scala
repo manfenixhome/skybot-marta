@@ -27,7 +27,8 @@ object DB {
     while (iterator.hasNext) {
       buffer.append(iterator.next().getAs[String]("skypeName").getOrElse(""))
     }
-    buffer.filterNot(user => user.nonEmpty)
+    println(buffer)
+    buffer.filterNot(user => user.isEmpty)
   }
 
   def subscribeOnTask(taskId: Long, skypeName: String): Boolean = {
