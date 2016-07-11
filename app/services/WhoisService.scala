@@ -54,7 +54,7 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
     println("Search for: " + q);
 
     val users: Seq[User] = /*cache.getOrElse[Seq[User]]("users.filter", 12.hours) */{
-      val request = ws.url("http://10.0.1.249/api/workers").get.map {
+      val request = ws.url("http://eworkers.paul.ekreative.com/api/workers").get.map {
         response =>
           println(response.status)
           var users = Seq[User]()
