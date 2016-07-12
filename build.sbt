@@ -14,7 +14,8 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "bootstrap-sass" % "3.3.6",
   "org.mongodb" %% "casbah" % "2.7.4",
   "com.gilt" % "jerkson_2.11" % "0.6.6",
-  "com.lihaoyi" %% "upickle" % "0.4.1",
+  "org.postgresql" % "postgresql" % "9.4-1204-jdbc4",
+  "com.typesafe.play" %% "anorm" % "2.5.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 )
 

@@ -14,19 +14,19 @@ object SubscribeService {
     message.toLowerCase.matches("^(subscribe|unsubscribe).*")
   }
 
-  def doAction(msg: UserMessage, sendService: SendMessageService): Unit = {
+  def doAction(msg: UserMessage, sendService: SendMessageService, db: DB): Unit = {
     println("do some")
     if (msg.content.toLowerCase.matches("^(subscribe|unsubscribe)\\s+\\d+\\s*$")) {
       val taskId = msg.content.toLowerCase.replaceAll("[^0-9]+", "").toInt
       if (taskId > 0 && taskId <= Task.tasks.size) {
         if (msg.content.toLowerCase.matches("^subscribe.*")) {
-          if (DB.subscribeOnTask(taskId, msg.from)) {
+          if (db.subscribeOnTask(taskId, msg.from)) {
             sendService.sendMessage(msg.from, "Subscribed")
           } else {
             sendService.sendMessage(msg.from, "hm... (movember) seems you already subscribed on this task")
           }
         } else {
-          if (DB.unsubscribeFromTask(taskId, msg.from)) {
+          if (db.unsubscribeFromTask(taskId, msg.from)) {
             sendService.sendMessage(msg.from, "Unsubscribed")
           } else {
             sendService.sendMessage(msg.from, "I'm sorry, but seems you aren't subscribed on this task")

@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
-class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) extends Controller {
+class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, db: DB) extends Controller {
 
   def receive = Action(parse.json) {
     request =>
@@ -29,11 +29,11 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
       for (msg <- messages) {
         msg.content.toLowerCase match {
           case x if x.matches("^ping\\s*") => sendService.sendMessage(msg.from, "pong")
-          case x if "admin-start-tasks".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService).startPlanning
-          case x if "start task 2".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService).launchTask(Task.tasks(1))
+          case x if "admin-start-tasks".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService, db).startPlanning
+          case x if "start task 2".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService, db).launchTask(Task.tasks(1))
           case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is s list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
           case x if x.toLowerCase.matches("^my\\s+tasks\\s*") => {
-            val myTasksIds = DB.getTasksByUser(msg.from)
+            val myTasksIds = db.getTasksByUser(msg.from)
             val myTasks = Task.tasks.filter(t => myTasksIds.contains(t.id))
             myTasks.nonEmpty match {
               case true => sendService.sendMessage(msg.from, "Here is s list of all your tasks:\n" + myTasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
@@ -41,7 +41,7 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
             }
           }
           case x if HelpService.hasKeywords(x) => HelpService.showHelp(msg, sendService)
-          case x if SubscribeService.hasKeywords(x) => SubscribeService.doAction(msg, sendService)
+          case x if SubscribeService.hasKeywords(x) => SubscribeService.doAction(msg, sendService, db)
           case x if HelloService.hasKeywords(x) => HelloService.doAction(msg, sendService)
           case x if new DoorOpenerService().hasKeywords(x) =>
             new DoorOpenerService().openDoor(msg.from, sendService)

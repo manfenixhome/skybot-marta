@@ -14,7 +14,7 @@ import utils.DB
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
-class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendMessage)(implicit exec: ExecutionContext) {
+class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendMessage, db: DB)(implicit exec: ExecutionContext) {
 
   var isStarted = false
 
@@ -35,19 +35,19 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
       Duration.create(task.delay, TimeUnit.SECONDS)) {
       //TODO getList of users for task
       val today = new DateTime().getDayOfWeek
-//      if (today != DateTimeConstants.SATURDAY && today != DateTimeConstants.SUNDAY) {
-      println("start task="+task.title)
-        val users = DB.getUsersByTaskId(task.id)
-      println("users="+users)
+      if (today != DateTimeConstants.SATURDAY && today != DateTimeConstants.SUNDAY) {
+        println("start task=" + task.title)
+        val users = db.getUsersByTaskId(task.id)
+        println("users=" + users)
         users.foreach(user => sendService.sendMessage(user, "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n"))))
-//      }
+      }
     }
   }
 
   def launchTask(task: Task): Unit = {
-    println("admin started task="+task.title)
-    val users = DB.getUsersByTaskId(task.id)
-    println("users="+users)
+    println("admin started task=" + task.title)
+    val users = db.getUsersByTaskId(task.id)
+    println("users=" + users)
     sendService.sendMessage("8:antonekreative", "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n")))
   }
 
