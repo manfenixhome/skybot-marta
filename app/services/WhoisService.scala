@@ -1,5 +1,6 @@
 package services
 
+import play.api.Configuration
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{Await, ExecutionContext}
@@ -16,7 +17,7 @@ import scala.concurrent.duration._
 /**
   * Created by cheb on 7/10/16.
   */
-class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) {
+class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, conf: Configuration) {
   val keywords = Seq("whois", "who", "wi", "кто", "хто")
   val keywordsHelp = Seq("-hlp", "-help", "-хелп", "-помоги", "-помощь", "-допомога", "-допоможи")
 
@@ -35,9 +36,9 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
         doShowHelp(userID, sendService)
       } else {
         if (keywords.contains(tags(0))) {
-          doSearch(tags(1), userID, sendService);
+          doSearch(tags(1), userID, sendService)
         } else {
-          doSearch(tags(0), userID, sendService);
+          doSearch(tags(0), userID, sendService)
         }
       }
     }
@@ -53,8 +54,8 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
   def doSearch(q: String, userID: String, sendService: SendMessageService): Unit = {
     println("Search for: " + q);
 
-    val users: Seq[User] = /*cache.getOrElse[Seq[User]]("users.filter", 12.hours) */{
-      val request = ws.url("http://eworkers.paul.ekreative.com/api/workers").get.map {
+    val users: Seq[User] = cache.getOrElse[Seq[User]]("whois.filter"+q, 2.hours) {
+      val request = ws.url(conf.getString("eworkers.endpoint").getOrElse("")).get.map {
         response =>
           println(response.status)
           var users = Seq[User]()

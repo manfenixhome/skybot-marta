@@ -1,5 +1,6 @@
 package services
 
+import play.api.Configuration
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{Await, ExecutionContext}
@@ -15,7 +16,7 @@ import scala.concurrent.duration._
 /**
   * Created by cheb on 7/9/16.
   */
-class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi) {
+class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, conf: Configuration) {
 
   val keys = Seq("-a", "-dgb")
   val keywords = Seq("list", "ls", "lst")
@@ -27,8 +28,8 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
 
   def showList(msg: String, userID: String, sendService: SendMessageService): Unit = {
     println("Show list")
-    val users: Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 12.hours) {
-      val request = ws.url("http://eworkers.paul.ekreative.com/api/workers").get.map {
+    val users: Seq[User] = cache.getOrElse[Seq[User]]("users.filter", 1.hours) {
+      val request = ws.url(conf.getString("eworkers.endpoint").getOrElse("")).get.map {
         response =>
           println(response.status)
           var users = Seq[User]()

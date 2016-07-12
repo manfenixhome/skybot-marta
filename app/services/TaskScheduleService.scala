@@ -22,7 +22,6 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
     //1+1
     //razvozka
 
-    //var развозка https://goo.gl/VXDzFk
     if (!isStarted) {
       Task.tasks.foreach(task => planningTask(task))
       isStarted = true
@@ -39,7 +38,7 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
         println("start task=" + task.title)
         val users = db.getUsersByTaskId(task.id)
         println("users=" + users)
-        users.foreach(user => sendService.sendMessage(user, "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n"))))
+        users.foreach(user => sendService.sendMessage(user, "%s \n%s".format(task.message, task.answers.mkString("\n"))))
       }
     }
   }
