@@ -13,7 +13,7 @@
 # HTML checks for a string within the HTML url document.
 #
 
-PLAY_APPLICATION_NAME=mba
+PLAY_APPLICATION_NAME=skybot-marta
 PLAY_APPLICATION_PATH=/opt/source/skybot-marta/target/universal/stage
 PLAY_PORT=80
 PLAY_STATUS_METHOD=HTML
