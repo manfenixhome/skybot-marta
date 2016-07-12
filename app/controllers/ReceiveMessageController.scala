@@ -4,6 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
 import model.UserMessage
+import play.api.Configuration
 import play.api.mvc.{Action, Controller}
 import com.codahale.jerkson.{ParsingException, Json => json}
 import play.api.cache.CacheApi
@@ -19,7 +20,7 @@ import scala.concurrent.ExecutionContext
   * Created by ekreative on 7/9/2016.
   */
 @Singleton
-class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, db: DB) extends Controller {
+class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, db: DB,conf: Configuration) extends Controller {
 
   def receive = Action(parse.json) {
     request =>
