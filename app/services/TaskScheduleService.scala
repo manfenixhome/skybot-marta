@@ -46,8 +46,8 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
   def launchTask(task: Task): Unit = {
     println("admin started task=" + task.title)
     val users = db.getUsersByTaskId(task.id)
-    println("users=" + users)
-    sendService.sendMessage("8:antonekreative", "%d) %s \n%s".format(task.id, task.message, task.answers.mkString("\n")))
+    users.foreach(user => sendService.sendMessage(user, "%s \n%s".format(task.message, task.answers.mkString("\n"))))
+    sendService.sendMessage("8:antonekreative", "Sent")
   }
 
   def nextExecutionInSeconds(launch: DateTime): Int = {
