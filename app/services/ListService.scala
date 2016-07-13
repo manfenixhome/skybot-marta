@@ -64,9 +64,9 @@ class ListService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache
           sb.append(" workingEmail: " + item.workingEmail)
           sb.append(" startWorking: " + item.startWorking)
           sb.append(" birthday: " + item.birthday)
-          if (item.technology.isDefined && item.technology.get.nonEmpty){
-            sb.append("technologies: " + item.technology.get.toString())
-          }
+//          if (item.technology.isDefined && item.technology.get.nonEmpty){
+//            sb.append("technologies: " + item.technology.get.toString())
+//          }
           sb.append("\n\n")
         }
         sendService.sendMessage(userID, "List: \n" + sb)
