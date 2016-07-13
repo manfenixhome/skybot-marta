@@ -19,15 +19,27 @@ class DB @Inject() (@NamedDatabase("marta") db: Database){
   }
 
   def subscribeOnTask(taskId: Long, skypeName: String): Boolean = {
-//    !taskSubscribers.update(DBObject("taskId" -> taskId, "skypeName" -> skypeName), DBObject("taskId" -> taskId, "skypeName" -> skypeName),true,false).isUpdateOfExisting
-    //TODO
-    true
+    db.withConnection { implicit conn =>
+      if (!getTasksByUser(skypeName).contains(taskId)) {
+        val id: Option[Long] = SQL("INSERT into task_subscribers(task_id, skype_name) values ({taskId}, {skypeName})")
+          .on("taskId" -> taskId, "skypeName" -> skypeName).executeInsert()
+        id.isDefined
+      } else {
+        false
+      }
+    }
   }
 
   def unsubscribeFromTask(taskId: Long, skypeName: String): Boolean = {
-//    taskSubscribers.remove(DBObject("taskId" -> taskId, "skypeName" -> skypeName)).getN > 0
-    //TODO
-    true
+    db.withConnection { implicit conn =>
+      if (getTasksByUser(skypeName).contains(taskId)) {
+        val count: Int = SQL("DELETE FROM task_subscribers WHERE task_id = {taskId} AND skype_name = {skypeName}")
+          .on("taskId" -> taskId, "skypeName" -> skypeName).executeUpdate()
+        count > 0
+      } else {
+        false
+      }
+    }
   }
 
   def getTasksByUser(skypeName: String): Seq[Long] = {
