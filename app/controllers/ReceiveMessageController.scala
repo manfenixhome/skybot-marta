@@ -31,7 +31,7 @@ class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: 
         msg.content.toLowerCase match {
           case x if x.matches("^ping\\s*") => sendService.sendMessage(msg.from, "pong")
           case x if "admin-start-tasks".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService, db).startPlanning
-          case x if "start task 2".equals(x) && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService, db).launchTask(Task.tasks(1))
+          case x if x.matches("^start task \\d+") && msg.from.equals("8:antonekreative") => new TaskScheduleService(actorSystem, sendService, db).launchTask(Task.tasks(x.toLowerCase.replaceAll("[^0-9]+", "").toInt))
           case x if x.toLowerCase.matches("^tasks.*") => sendService.sendMessage(msg.from, "Here is s list of all tasks:\n" + Task.tasks.map(t => "%d) %s".format(t.id, t.title)).mkString("\n"))
           case x if x.toLowerCase.matches("^my\\s+tasks\\s*") => {
             val myTasksIds = db.getTasksByUser(msg.from)
