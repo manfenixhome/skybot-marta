@@ -20,11 +20,13 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
 
   def startPlanning: Unit = {
     //1+1
-    //razvozka
 
     if (!isStarted) {
       Task.tasks.foreach(task => planningTask(task))
       isStarted = true
+      sendService.sendMessage("8:antonekreative", "Tasks started")
+    } else {
+      sendService.sendMessage("8:antonekreative", "Tasks already started")
     }
   }
 
@@ -35,9 +37,7 @@ class TaskScheduleService @Inject()(actorSystem: ActorSystem, sendService: SendM
       //TODO getList of users for task
       val today = new DateTime().getDayOfWeek
       if (today != DateTimeConstants.SATURDAY && today != DateTimeConstants.SUNDAY) {
-        println("start task=" + task.title)
         val users = db.getUsersByTaskId(task.id)
-        println("users=" + users)
         users.foreach(user => sendService.sendMessage(user, "%s \n%s".format(task.message, task.answers.mkString("\n"))))
       }
     }

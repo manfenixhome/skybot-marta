@@ -17,6 +17,7 @@ import scala.concurrent.duration._
 /**
   * Created by cheb on 7/10/16.
   */
+@Singleton
 class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, conf: Configuration) {
   val keywords = Seq("whois", "who", "wi", "кто", "хто")
   val keywordsHelp = Seq("-hlp", "-help", "-хелп", "-помоги", "-помощь", "-допомога", "-допоможи")
@@ -27,7 +28,7 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
   }
 
   def trySearch(message: String, userID: String, sendService: SendMessageService): Unit = {
-    println("Query: " + message);
+    println("Query: " + message)
     val tags = message.toLowerCase.split(" ")
     if (tags.length < 2) {
       sendService.sendMessage(userID, "Please add a skype ID parameter or type 'whois -help'")
@@ -42,7 +43,6 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
         }
       }
     }
-    //sendService.sendMessage(userID, "searching...")
   }
 
   def doShowHelp(userID: String, sendService: SendMessageService): Unit = {
@@ -73,8 +73,10 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
   }
 
   def findUsers(q: String, users: Seq[User], userID: String, sendService: SendMessageService): Unit = {
-    println("Trying to find: " + q);
-    val matchedUsers = users.filter(u => u.skype != null && u.skype.indexOf(q) > -1)
+    val matchedUsers = users.filter(u =>
+      (u.skype != null && u.skype.indexOf(q) > -1) ||
+      (u.name != null && u.name.indexOf(q) > -1) ||
+      (u.workingEmail != null && u.workingEmail.indexOf(q) > -1))
     if (matchedUsers.isEmpty) {
       sendService.sendMessage(userID, "No results, sorry")
     } else {
@@ -84,28 +86,8 @@ class WhoisService @Inject()(implicit exec: ExecutionContext, ws: WSClient, cach
 
   def printUsers(users: Seq[User], userID: String, sendService: SendMessageService): Unit = {
     println(users)
-    //val sb = mutable.Buffer[String]()
-    val sb = new java.lang.StringBuilder
     users.foreach { item =>
-      sb.append("\nid: " + item.id)
-      sb.append("\nname: " + item.name)
-      sb.append("\nskype: " + item.skype)
-      sb.append("\nworkingEmail: " + item.workingEmail)
-      sb.append("\nstartWorking: " + item.startWorking)
-      sb.append("\nbirthday: " + item.birthday)
-      if (item.technology.isDefined && item.technology.get.nonEmpty){
-        sb.append("\ntechnologies: " + item.technology.get.toString())
-      }
-      /*if (item.technology.isDefined && item.technology.get.nonEmpty){
-        sb.append(" technologies: \n" )
-        sb.append(item.technology.get.map(t => t.name).mkString("\n"))
-      }*/
-      /*if (item.images.isDefined && item.images.nonEmpty) {
-        val image =  item.images.get.head
-        sb.append(" image: " + image.src)
-      }*/
-      sb.append("\n")
+      sendService.sendMessage(userID, User.toSkypeMessage(item))
     }
-    sendService.sendMessage(userID, "Result: \n" + sb.toString())
   }
 }
