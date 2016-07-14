@@ -15,7 +15,7 @@ class DoorOpenerService @Inject()(implicit exec: ExecutionContext, ws: WSClient)
   val keywords = Seq("^\\s*open\\s*d(o+)r\\s*$", "^\\s*open\\s*gate(s)?\\s*$")
 
   def hasKeywords(message: String): Boolean = {
-    keywords.exists(r => message.matches(r))
+    keywords.exists(r => message.toLowerCase.matches(r))
   }
 
   def openDoor(userID: String, sendService: SendMessageService): Unit = {
