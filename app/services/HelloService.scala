@@ -29,7 +29,6 @@ object HelloService {
       case x if x > 18 && x < 24 => sendService.sendMessage(msg.from, "Good evening "+ msg.realName + " " + Random.shuffle(eveningSmiles).head)
       case x if x > 24 && x < 6 => sendService.sendMessage(msg.from, "Are you seriously? Please go to bed "+ msg.realName + " " + Random.shuffle(nightSmiles).head)
     }
-    sendService.sendMessage(msg.from, "Hi "+ msg.realName)
   }
 
 }

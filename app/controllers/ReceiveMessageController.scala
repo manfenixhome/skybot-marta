@@ -22,6 +22,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ReceiveMessageController @Inject()(actorSystem: ActorSystem, sendService: SendMessageService)(implicit exec: ExecutionContext, ws: WSClient, cache: CacheApi, db: DB,conf: Configuration) extends Controller {
 
+  new TaskScheduleService(actorSystem, sendService, db).startPlanning
+
   def receive = Action(parse.json) {
     request =>
       println("request body ="+request.body)
